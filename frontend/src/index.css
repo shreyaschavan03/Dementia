@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* small custom */
-html,body,#root { height: 100%; }
-body { @apply bg-gray-50 text-gray-900; }
+/* Base layout */
+html, body {
+  height: 100%;
+  overflow-y: auto; /* Always show scrollbar */
+  scroll-behavior: smooth; /* Smooth scrolling */
+}
+
+body {
+  @apply bg-gray-50 text-gray-900;
+}
+
+#root {
+  /* Remove fixed height to allow natural scrolling of content */
+  min-height: 100%;
+}
