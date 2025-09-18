@@ -17,7 +17,22 @@ export default function SignupPage() {
     e.preventDefault();
     setError("");
 
+    // Validation checks
+    if (!email || !password || !confirmPassword) {
+      alert("Please fill in all fields!");
+      setError("Please fill in all fields!");
+      return;
+    }
+
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address!");
+      setError("Please enter a valid email address!");
+      return;
+    }
+
     if (password !== confirmPassword) {
+      alert("Passwords do not match!");
       setError("Passwords do not match!");
       return;
     }
@@ -32,12 +47,15 @@ export default function SignupPage() {
       const data = await res.json();
 
       if (!res.ok) {
+        alert(data.message || "Signup failed!");
         setError(data.message || "Signup failed");
       } else {
         localStorage.setItem("token", data.token || "demoToken123");
+        alert("Signup successful! Redirecting...");
         navigate("/home");
       }
     } catch (err) {
+      alert("Server error. Please try again later.");
       setError("Server error. Please try again later.");
       console.error(err);
     }
