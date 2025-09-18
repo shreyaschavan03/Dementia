@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import Dashboard from "./pages/Dashboard";
+import HomePage from "./pages/HomePage";
 
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
@@ -43,7 +43,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route
           path="/home"
-          element={<Dashboard theme="light" username="Shreyas" />}
+          element={<HomePage theme="light" username="Shreyas" />}
         />{" "}
       </Routes>
     </div>

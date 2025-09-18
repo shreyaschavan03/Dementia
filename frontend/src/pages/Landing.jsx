@@ -50,7 +50,9 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
             : "bg-white/30 text-gray-700"
         }`}
       >
-        <h1 className="text-3xl font-extrabold text-purple-700">🧠 NeuroNest</h1>
+        <h1 className="text-3xl font-extrabold text-purple-700">
+          🧠 NeuroNest
+        </h1>
 
         <div className="flex gap-8 font-medium">
           <a href="#home" className="hover:text-purple-600 transition">
@@ -169,6 +171,16 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
           <motion.div
             {...infiniteAnim}
             className={sectionBg + " flex gap-10 items-center"}
+            onClick={() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                // Redirect to Games page
+                navigate("/login");
+              } else {
+                // Redirect to login page
+                navigate("/games");
+              }
+            }}
           >
             <div className="text-5xl">🧩</div>
             <div>
@@ -187,6 +199,16 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
           <motion.div
             {...infiniteAnim}
             className={sectionBg + " flex gap-10 items-center"}
+            onClick={() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                // Redirect to Games page
+                navigate("/login");
+              } else {
+                // Redirect to login page
+                navigate("/community");
+              }
+            }}
           >
             <div className="text-5xl">👥</div>
             <div>
@@ -207,6 +229,16 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
           <motion.div
             {...infiniteAnim}
             className={sectionBg + " flex gap-10 items-center"}
+            onClick={() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                // Redirect to Games page
+                navigate("/login");
+              } else {
+                // Redirect to login page
+                navigate("/reports");
+              }
+            }}
           >
             <div className="text-5xl">📊</div>
             <div>
@@ -238,7 +270,7 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
                 )}
               </p>
             </div>
-            <div>
+            <div> 
               <h3 className="text-lg font-semibold mb-3">{t("Contact")}</h3>
               <ul className="space-y-2 text-purple-200">
                 <li>📍 Mumbai, India</li>
