@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import Dashboard from "./pages/Dashboard";
 
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
@@ -40,6 +41,10 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route
+          path="/home"
+          element={<Dashboard theme="light" username="Shreyas" />}
+        />{" "}
       </Routes>
     </div>
   );
