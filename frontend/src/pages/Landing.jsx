@@ -2,14 +2,34 @@ import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import brainImg from "../assets/brain.png";
+import { useNavigate } from "react-router-dom";
 
 export default function Landing({ theme, setTheme, language, setLanguage }) {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
 
-  // Change language dynamically
   useEffect(() => {
     i18n.changeLanguage(language);
   }, [language, i18n]);
+
+  const handleStart = () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/login");
+    } else {
+      navigate("/home");
+    }
+  };
+
+  // Animation config for infinite subtle float/fade
+  const infiniteAnim = {
+    animate: { opacity: [0.8, 1, 0.8], y: [20, 0, 20] },
+    transition: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+  };
+
+  // Modern professional bg class
+  const sectionBg =
+    "relative p-12 rounded-2xl shadow-xl bg-gradient-to-r from-purple-600/10 via-blue-400/10 to-pink-500/10 backdrop-blur-md border border-white/10";
 
   return (
     <div
@@ -53,7 +73,6 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
         </div>
 
         <div className="flex gap-4 items-center">
-          {/* Language Selector */}
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
@@ -64,7 +83,6 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
             <option value="hi">Hindi</option>
           </select>
 
-          {/* Dark Mode Toggle */}
           <button
             onClick={() => setTheme(theme === "light" ? "dark" : "light")}
             className="px-3 py-2 rounded-full border border-purple-600 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-gray-700 transition text-sm"
@@ -72,11 +90,16 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
             {theme === "dark" ? "☀ Light" : "🌙 Dark"}
           </button>
 
-          {/* Auth Buttons */}
-          <button className="px-4 py-2 rounded-full border border-purple-600 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-gray-700 transition">
+          <button
+            onClick={() => navigate("/login")}
+            className="px-4 py-2 rounded-full border border-purple-600 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-gray-700 transition"
+          >
             {t("Log In")}
           </button>
-          <button className="px-4 py-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition">
+          <button
+            onClick={() => navigate("/signup")}
+            className="px-4 py-2 rounded-full bg-purple-600 text-white hover:bg-purple-700 transition"
+          >
             {t("Sign Up")}
           </button>
         </div>
@@ -104,10 +127,12 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
           <div className="mt-8 flex gap-6">
             <motion.button
               whileHover={{ scale: 1.05 }}
+              onClick={handleStart}
               className="px-8 py-3 rounded-full bg-purple-600 text-white text-lg shadow-lg hover:bg-purple-700 transition"
             >
               {t("Start Now")}
             </motion.button>
+
             <motion.button
               whileHover={{ scale: 1.05 }}
               className="px-8 py-3 rounded-full border-2 border-purple-600 text-purple-700 dark:text-purple-300 text-lg hover:bg-purple-50 dark:hover:bg-gray-700 transition"
@@ -127,11 +152,12 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
             src={brainImg}
             alt="Brain"
             className="w-[400px] drop-shadow-2xl"
-            animate={{ y: [0, -40, 0] }}
+            animate={{ y: [0, -50, 0] }}
             transition={{
-              duration: 4,
+              duration: 6,
               repeat: Infinity,
               repeatType: "reverse",
+              ease: "easeInOut",
             }}
           />
           <div className="absolute inset-0 blur-3xl bg-purple-300/20 rounded-full -z-10" />
@@ -143,11 +169,18 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
         {/* Games */}
         <section id="games" className="scroll-mt-24">
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 flex gap-10 items-center hover:shadow-2xl transition"
+            {...infiniteAnim}
+            className={sectionBg + " flex gap-10 items-center"}
+            onClick={() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                // Redirect to Games page
+                navigate("/login");
+              } else {
+                // Redirect to login page
+                navigate("/games");
+              }
+            }}
           >
             <div className="text-5xl">🧩</div>
             <div>
@@ -164,11 +197,18 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
         {/* Community */}
         <section id="community" className="scroll-mt-24">
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 flex gap-10 items-center hover:shadow-2xl transition"
+            {...infiniteAnim}
+            className={sectionBg + " flex gap-10 items-center"}
+            onClick={() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                // Redirect to Games page
+                navigate("/login");
+              } else {
+                // Redirect to login page
+                navigate("/community");
+              }
+            }}
           >
             <div className="text-5xl">👥</div>
             <div>
@@ -187,11 +227,18 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
         {/* Reports */}
         <section id="reports" className="scroll-mt-24">
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 1 }}
-            className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-12 flex gap-10 items-center hover:shadow-2xl transition"
+            {...infiniteAnim}
+            className={sectionBg + " flex gap-10 items-center"}
+            onClick={() => {
+              const token = localStorage.getItem("token");
+              if (token) {
+                // Redirect to Games page
+                navigate("/login");
+              } else {
+                // Redirect to login page
+                navigate("/reports");
+              }
+            }}
           >
             <div className="text-5xl">📊</div>
             <div>
@@ -210,8 +257,7 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
       <section id="contact" className="scroll-mt-24">
         <motion.footer
           initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
           className="bg-purple-800 text-white mt-32"
         >
@@ -224,7 +270,7 @@ export default function Landing({ theme, setTheme, language, setLanguage }) {
                 )}
               </p>
             </div>
-            <div>
+            <div> 
               <h3 className="text-lg font-semibold mb-3">{t("Contact")}</h3>
               <ul className="space-y-2 text-purple-200">
                 <li>📍 Mumbai, India</li>
