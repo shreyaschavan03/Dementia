@@ -6,12 +6,12 @@ const MAX_ROUNDS = 10;
 const REVEAL_DURATION = 500; // ms to show each symbol
 const PAUSE_DURATION = 200; // ms pause between symbols
 
-// --- NEW FEATURE: THEME DEFINITIONS ---
+// --- THEME DEFINITIONS ---
 const THEMES = {
   DARK: {
     name: "Dark Mode",
     background: "bg-gray-900",
-    text: "text-white",
+    text: "text-white", // Text color for Dark Mode
     card: "bg-gray-800 shadow-2xl",
     headingGradient: "from-green-400 to-blue-500",
     buttonBase: "text-white",
@@ -21,7 +21,7 @@ const THEMES = {
   LIGHT: {
     name: "Light Mode",
     background: "bg-gray-100",
-    text: "text-gray-900",
+    text: "text-gray-900", // Text color for Light Mode (Dark text)
     card: "bg-white shadow-xl border border-gray-200",
     headingGradient: "from-teal-500 to-green-600",
     buttonBase: "text-gray-800 border border-gray-300",
@@ -167,10 +167,11 @@ export default function PatternGame() {
   
   const renderUserInputDisplay = () => (
     <div className="text-4xl mb-8 h-10 flex justify-center font-mono">
-        {gameState === 'INPUT' 
-            ? <span className={`${theme.text}/70`}>Click the symbols in order...</span>
-            : <span className={`${theme.text}/70`}>Wait for the pattern...</span>
-        }
+      {/* FIX: Remove theme.text from here and rely on the parent container */}
+      {gameState === 'INPUT' 
+        ? <span className="opacity-70">Click the symbols in order...</span>
+        : <span className="opacity-70">Wait for the pattern...</span>
+      }
     </div>
   );
   
@@ -195,7 +196,9 @@ export default function PatternGame() {
 
   const renderFeedback = () => {
     let message = `Round ${round} of ${MAX_ROUNDS}`;
-    let style = `${theme.text}/80`;
+    
+    // FIX: Remove theme.text from the base style and rely on the parent container
+    let style = "opacity-80"; 
 
     if (feedback === 'CORRECT') {
       message = `✅ PERFECT! +${pattern.length * 5} points!`;
@@ -213,11 +216,13 @@ export default function PatternGame() {
   };
 
   const renderGameOver = () => (
-    <div className={`animate-fade-in ${theme.text}/90`}>
+    // FIX: Removed theme.text/90 from here
+    <div className="animate-fade-in opacity-90">
       <h3 className="text-5xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-red-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
         {feedback === 'INCORRECT' ? 'Game Over!' : 'Challenge Complete!'}
       </h3>
-      <p className={`text-4xl font-extrabold mb-6 ${theme.text}`}>
+      {/* FIX: Removed explicit theme.text from this line as well. */}
+      <p className="text-4xl font-extrabold mb-6">
         Final Score: <span className="text-yellow-400">{score}</span>
       </p>
       <button
@@ -258,7 +263,8 @@ export default function PatternGame() {
             <ThemeSelector />
         </div>
 
-        <div className={`p-8 rounded-xl ${theme.card} text-center`}>
+        {/* CRITICAL FIX: Applying theme.text to the main card container */}
+        <div className={`p-8 rounded-xl ${theme.card} text-center ${theme.text}`}>
           
           {/* Heading with Dynamic Gradient */}
           <h2 className={`text-4xl font-extrabold mb-6 animate-bounce
@@ -276,7 +282,8 @@ export default function PatternGame() {
               {renderUserInputDisplay()}
               {renderInputButtons()}
 
-              <p className={`mt-6 text-3xl font-mono ${theme.text}`}>
+              {/* FIX: Removed explicit theme.text from here, relying on parent inheritance */}
+              <p className="mt-6 text-3xl font-mono">
                 ⭐ Score: {score} | Input: {userInput.length} / {pattern.length}
               </p>
               {renderFeedback()}

@@ -9,7 +9,7 @@ const THEMES = {
   DARK: {
     name: "Dark Mode",
     background: "bg-gray-900",
-    text: "text-white",
+    text: "text-white", // White text for dark backgrounds
     card: "bg-gray-800 shadow-2xl",
     headingGradient: "from-pink-500 to-yellow-500",
     buttonBase: "text-white",
@@ -20,7 +20,7 @@ const THEMES = {
   LIGHT: {
     name: "Light Mode",
     background: "bg-gray-100",
-    text: "text-gray-900",
+    text: "text-gray-900", // Dark text for light backgrounds
     card: "bg-white shadow-xl border border-gray-200",
     headingGradient: "from-blue-600 to-cyan-500",
     buttonBase: "text-gray-800 border border-gray-300",
@@ -85,8 +85,9 @@ export default function StroopGame() {
     trialDataRef.current.push({
       round,
       word: trial.word,
+      isCorrect: isCorrect, // Ensure this data point is saved
+      reactionTime: rt, // Save RT for final score calculation
       points: isCorrect ? points : 0,
-      // ... other data
     });
 
     // Short delay before moving to the next trial to allow VFX to show
@@ -117,8 +118,9 @@ export default function StroopGame() {
 
   const renderGame = () => (
     <>
-      <div className={`text-xl font-mono mb-4 ${theme.text}/70`}>
-        Set: **{currentSet}** / {totalSets} | Round: **{round}** / {TOTAL_ROUNDS}
+      {/* FIX 1: Removed explicit theme.text from here. Relying on parent container. */}
+      <div className="text-xl font-mono mb-4 opacity-70"> 
+        ✨ Set: <span className="text-2xl font-bold text-blue-400">{currentSet}</span> / {totalSets} | 🎯 Round: <span className="text-2xl font-bold text-blue-400">{round}</span> / {TOTAL_ROUNDS}
       </div>
 
       {/* Word Display with Smoke Effect on Correct Answer */}
@@ -126,19 +128,19 @@ export default function StroopGame() {
         className={`text-6xl font-extrabold mb-10 transition-all duration-300 ease-in-out relative
           ${lastChoiceCorrect === true ? "scale-110 shadow-green-500/80 drop-shadow-[0_0_30px_rgba(50,250,50,0.8)] animate-pulse" : ""}
           ${lastChoiceCorrect === false ? "shake-effect shadow-red-500/80 drop-shadow-[0_0_30px_rgba(250,50,50,0.8)]" : ""}
-          ${theme.text}
+          
+          /* FIX 2: Removed explicit theme.text from the word display, relies on parent */
           `}
         style={{ color: trial.color, animation: lastChoiceCorrect === null ? "flash 1.5s infinite" : "none" }}
       >
         {trial.word.toUpperCase()}
 
-        {/* --- SMOKE EFFECT ELEMENT (NEW) --- */}
+        {/* --- SMOKE EFFECT ELEMENT --- */}
         {lastChoiceCorrect === true && (
-             <span 
-                className="absolute inset-0 z-0 animate-smoke"
-                // The pseudo-element used in CSS will create the visual smoke/mist effect
-                aria-hidden="true" 
-             />
+          <span 
+            className="absolute inset-0 z-0 animate-smoke"
+            aria-hidden="true" 
+          />
         )}
       </div>
 
@@ -168,28 +170,37 @@ export default function StroopGame() {
           </button>
         ))}
       </div>
+      
+      {/* Score Display */}
+      <p className="mt-8 text-4xl font-extrabold opacity-90">
+        🏆 Score: <span className="text-yellow-400">{score.toFixed(1)}</span>
+      </p>
     </>
   );
 
   const renderFinalScore = () => {
+    // Recalculate reaction time properly after the game ends
     const correctTrials = trialDataRef.current.filter(t => t.isCorrect);
     const avgReactionTime = correctTrials.length > 0
       ? correctTrials.reduce((sum, t) => sum + t.reactionTime, 0) / correctTrials.length
       : 0;
 
     return (
-      <div className={`text-center p-8 rounded-xl ${theme.card} animate-fade-in`}>
+      <div className={`text-center p-8 rounded-xl animate-fade-in`}> 
         <h2 className="text-6xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-pink-500 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
           🎉 Test Complete! 🎉
         </h2>
-        <p className={`text-5xl font-extrabold mb-4 ${theme.text}`}>
+        {/* FIX 3: Removed explicit theme.text from this line */}
+        <p className="text-5xl font-extrabold mb-4">
           Total Score: <span className="text-yellow-400">{score.toFixed(1)}</span>
         </p>
-        <p className={`text-2xl font-mono ${theme.text}/80`}>
-          Correct Responses: **{correctTrials.length}** / {TOTAL_ROUNDS}
+        
+        {/* FIX 4: Replaced ** with emojis and removed explicit theme.text */}
+        <p className="text-2xl font-mono opacity-80">
+          ✅ Correct Responses: <span className="font-bold text-green-500">{correctTrials.length}</span> / {TOTAL_ROUNDS}
         </p>
-        <p className={`text-2xl font-mono ${theme.text}/80 mb-8`}>
-          Average Reaction Time: **{avgReactionTime.toFixed(3)}s**
+        <p className="text-2xl font-mono opacity-80 mb-8">
+          ⏱️ Avg. Reaction Time: <span className="font-bold text-cyan-500">{avgReactionTime.toFixed(3)}s</span>
         </p>
         <button
           onClick={() => {
@@ -209,7 +220,6 @@ export default function StroopGame() {
 
   return (
     <div className={`min-h-screen p-8 flex items-center justify-center ${theme.background}`}>
-      {/* --- SMOKE EFFECT CSS (NEW) --- */}
       <style>{`
         /* Existing Keyframes */
         @keyframes pop-up { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(2); } }
@@ -220,7 +230,7 @@ export default function StroopGame() {
         @keyframes fade-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fade-in { animation: fade-in 0.8s ease-out; }
 
-        /* --- SMOKE/MIST KEYFRAMES (NEW) --- */
+        /* --- SMOKE/MIST KEYFRAMES --- */
         @keyframes smoke-puff {
             0% { 
                 opacity: 0; 
@@ -258,7 +268,8 @@ export default function StroopGame() {
             <ThemeSelector />
         </div>
 
-        <div className={`p-8 rounded-xl ${theme.card} text-center`}>
+        {/* CRITICAL FIX: Applying theme.text to the main card container */}
+        <div className={`p-8 rounded-xl ${theme.card} text-center ${theme.text}`}>
             
             {/* Heading */}
             <h2 className={`text-4xl font-extrabold mb-6 animate-bounce
