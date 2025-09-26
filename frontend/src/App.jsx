@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import HomePage from "./pages/HomePage";
+import GameHub from "./components/GameHub";
 
 import Landing from "./pages/Landing";
 import LoginPage from "./pages/LoginPage";
@@ -44,7 +45,9 @@ function App() {
         <Route
           path="/home"
           element={<HomePage theme="light" username="Shreyas" />}
-        />{" "}
+        />
+        {/* ✅ New route for your game hub */}
+        <Route path="/games" element={<GameHub />} />
       </Routes>
     </div>
   );
