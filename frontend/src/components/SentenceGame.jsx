@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
 
-// --- THEME DEFINITIONS ---
 const THEMES = {
   DARK: {
     name: "Dark Mode",
@@ -15,7 +14,7 @@ const THEMES = {
   LIGHT: {
     name: "Light Mode",
     background: "bg-gray-100",
-    text: "text-gray-900", // Dark text for light backgrounds
+    text: "text-gray-900",
     card: "bg-white shadow-xl border border-gray-200",
     headingGradient: "from-blue-600 to-indigo-700",
     buttonBase: "text-gray-800 border border-gray-300",
@@ -24,7 +23,6 @@ const THEMES = {
   },
 };
 
-// --- EXPANDED QUESTION BANK ---
 const ALL_SENTENCES = [
   { id: 1, question: "The Earth is flat.", options: ["True", "False"], answer: "False" },
   { id: 2, question: "A decade is 10 years.", options: ["True", "False"], answer: "True" },
@@ -41,16 +39,14 @@ const ALL_SENTENCES = [
 const TOTAL_QUESTIONS = 5;
 const POINTS_PER_CORRECT = 100;
 
-export default function SentenceGame() {
-  // --- State Variables ---
+export default function SentenceGame({ onGameComplete, onNextGame }) {
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
-  const [gameState, setGameState] = useState('PLAYING');
+  const [gameState, setGameState] = useState('IDLE');
   const [feedback, setFeedback] = useState(null);
   const [theme, setTheme] = useState(THEMES.DARK);
 
-  // --- Helper: Prepare Random Questions ---
   const initializeGame = useCallback(() => {
     const shuffled = ALL_SENTENCES.sort(() => 0.5 - Math.random());
     setQuestions(shuffled.slice(0, TOTAL_QUESTIONS));
@@ -60,12 +56,6 @@ export default function SentenceGame() {
     setFeedback(null);
   }, []);
 
-  // --- Effects ---
-  useEffect(() => {
-    initializeGame();
-  }, [initializeGame]);
-
-  // --- Handlers ---
   function handleChoice(choice) {
     if (gameState !== 'PLAYING' || feedback !== null) return;
 
@@ -79,45 +69,43 @@ export default function SentenceGame() {
       setFeedback('INCORRECT');
     }
 
-    // Delay move to next question to show feedback
     setTimeout(() => {
       if (current < questions.length - 1) {
         setCurrent(c => c + 1);
         setFeedback(null);
       } else {
+        const gameData = {
+          game_type: 'sentence_verification',
+          total_score: score + (isCorrect ? POINTS_PER_CORRECT : 0),
+          total_questions: TOTAL_QUESTIONS,
+          accuracy: ((score + (isCorrect ? POINTS_PER_CORRECT : 0)) / (TOTAL_QUESTIONS * POINTS_PER_CORRECT)) * 100,
+          completed_at: new Date().toISOString()
+        };
+        if (onGameComplete) onGameComplete(gameData);
         setGameState('GAME_OVER');
       }
     }, 800);
   }
 
-  // --- Theme Toggler Component ---
   const ThemeSelector = () => {
     const nextTheme = theme === THEMES.DARK ? THEMES.LIGHT : THEMES.DARK;
     return (
       <button
         onClick={() => setTheme(nextTheme)}
-        title={`Switch to ${nextTheme.name}`}
-        className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all duration-300 transform active:scale-90 shadow-md
-          ${theme.switcherBase}
-        `}
+        className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all duration-300 transform active:scale-90 shadow-md ${theme.switcherBase}`}
       >
         {nextTheme.icon}
       </button>
     );
   };
 
-
-  // --- Render Functions ---
-
   const renderGameContent = () => {
     const currentQuestion = questions[current];
     
-    // Dynamic classes based on feedback and theme
     const baseQuestionStyle = theme === THEMES.DARK 
       ? 'bg-gray-700/60 drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]'
       : 'bg-gray-200/60 shadow-md border border-gray-300';
 
-    // FIX 1: Removed explicit theme.text from questionClass because it's applied on the parent container now.
     const questionClass = `text-3xl mb-10 font-medium transition-all duration-300 p-4 rounded-lg 
       ${feedback === 'CORRECT' ? 'bg-green-600/80 shadow-green-400 drop-shadow-[0_0_20px_rgba(50,250,50,0.8)] animate-pulse' : ''}
       ${feedback === 'INCORRECT' ? 'bg-red-600/80 shadow-red-400 drop-shadow-[0_0_20px_rgba(250,50,50,0.8)] animate-shake' : ''}
@@ -125,12 +113,10 @@ export default function SentenceGame() {
 
     return (
       <>
-        {/* Question Display */}
         <div className={questionClass}>
           {currentQuestion.question}
         </div>
 
-        {/* Buttons */}
         <div className="flex gap-4 justify-center">
           {currentQuestion.options.map(opt => (
             <button
@@ -151,11 +137,9 @@ export default function SentenceGame() {
   };
 
   const renderScoreDisplay = () => {
-    // FIX 2: Removed dynamic color application, relying on parent container for base text color.
-    // Use opacity to control lightness/darkness in neutral state.
     const baseColor = feedback === 'CORRECT' ? "text-green-400 drop-shadow-[0_0_20px_rgba(50,255,50,0.9)]" :
                       feedback === 'INCORRECT' ? "text-red-500" :
-                      "opacity-90"; // Base opacity (inherits correct theme color from parent)
+                      "opacity-90";
 
     const animationClass = feedback === 'CORRECT' ? "scale-110 animate-bounce" :
                            feedback === 'INCORRECT' ? "scale-100" :
@@ -173,24 +157,56 @@ export default function SentenceGame() {
   };
 
   const renderGameOver = () => (
-    // FIX 3: Removed explicit theme.text from here as well.
     <div className={`animate-fade-in p-6 rounded-xl opacity-90`}>
       <h3 className="text-5xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-yellow-400 drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
         Test Complete! 🏆
       </h3>
-      {/* The final score line needs the explicit theme color because it's often overridden */}
       <p className={`text-4xl font-extrabold mb-6 ${theme.text}`}> 
         Final Score: <span className="text-yellow-400">{score}</span>
       </p>
-      <button
-        onClick={initializeGame}
-        className="px-8 py-3 mt-4 text-xl font-bold rounded-full bg-blue-500 hover:bg-blue-600 transition duration-300 text-white shadow-lg transform hover:scale-105"
-      >
-        Play Again
-      </button>
+      <div className="flex gap-4 justify-center">
+        <button
+          onClick={initializeGame}
+          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 rounded-xl font-bold transition-all duration-300 text-white"
+        >
+          Play Again
+        </button>
+        {onNextGame && (
+          <button
+            onClick={onNextGame}
+            className="px-6 py-3 bg-green-500 hover:bg-green-600 rounded-xl font-bold transition-all duration-300 text-white"
+          >
+            Next Game →
+          </button>
+        )}
+      </div>
     </div>
   );
-  
+
+  if (gameState === 'IDLE') {
+    return (
+      <div className={`min-h-screen p-8 flex items-center justify-center ${theme.background}`}>
+        <div className="relative text-center w-full max-w-lg">
+          <div className="flex justify-end mb-4">
+            <ThemeSelector />
+          </div>
+          <div className={`p-6 rounded-xl ${theme.card} shadow-2xl ${theme.text}`}>
+            <h2 className={`text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r ${theme.headingGradient}`}>
+              🧠 Truth or Lie Challenge
+            </h2>
+            <p className="text-xl mb-6">Determine if statements are true or false</p>
+            <button
+              onClick={initializeGame}
+              className="px-8 py-4 bg-gradient-to-r from-green-500 to-blue-600 rounded-xl font-bold text-lg text-white transition-all duration-300 hover:scale-105"
+            >
+              Start Game
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (questions.length === 0) return null;
 
   return (
@@ -203,29 +219,22 @@ export default function SentenceGame() {
       `}</style>
 
       <div className="relative text-center w-full max-w-lg">
-        {/* Theme Selector Positioned Above the Card */}
         <div className="flex justify-end mb-4">
-            <ThemeSelector />
+          <ThemeSelector />
         </div>
 
-        {/* THIS IS THE CRITICAL FIX: Applying theme.text to the main card container */}
         <div className={`p-6 rounded-xl ${theme.card} shadow-2xl ${theme.text}`}>
-          
-          {/* Heading with Dynamic Gradient */}
-          <h2 className={`text-4xl font-extrabold mb-8 animate-bounce
-            text-transparent bg-clip-text bg-gradient-to-r ${theme.headingGradient}
-            drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]`}>
+          <h2 className={`text-4xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r ${theme.headingGradient}`}>
             🧠 Truth or Lie Challenge
           </h2>
 
-          {/* Game Content */}
-          {gameState === 'PLAYING' && current < questions.length ? (
+          {gameState === 'GAME_OVER' ? (
+            renderGameOver()
+          ) : (
             <>
               {renderGameContent()}
               {renderScoreDisplay()}
             </>
-          ) : (
-            renderGameOver()
           )}
         </div>
       </div>
